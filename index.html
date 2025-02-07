@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtisanAI Pro - Professional AI Image Generation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        .gradient-border {
+            background: linear-gradient(to right, #6366f1, #8b5cf6, #ec4899);
+            padding: 1px;
+            border-radius: 0.75rem;
+        }
+
+        .premium-badge {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+        }
+
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #6366f1;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-gray-900/90 backdrop-blur-md z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                </svg>
+                <span class="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                    ArtisanAI Pro
+                </span>
+            </div>
+            <div class="flex space-x-6 items-center">
+                <button id="newProjectBtn" class="bg-gray-800 px-6 py-2 rounded-full hover:bg-gray-700 transition-colors flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    New Project
+                </button>
+            </div>
+        </nav>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="flex pt-20">
+        <!-- History Sidebar -->
+        <aside class="w-80 fixed left-0 top-20 bottom-0 bg-gray-900 border-r border-gray-800 overflow-y-auto p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold">Generation History</h3>
+                <button onclick="clearHistory()" class="text-gray-400 hover:text-indigo-400 text-sm">
+                    Clear All
+                </button>
+            </div>
+            <div id="historyList" class="space-y-2"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-80 flex-1 p-8">
+            <!-- Generation Interface -->
+            <section class="max-w-3xl mx-auto">
+                <div class="space-y-8">
+                    <!-- Premium Banner -->
+                    <div class="gradient-border rounded-lg">
+                        <div class="bg-gray-900 rounded-lg p-4 flex items-center justify-between">
+                            <div>
+                                <span class="premium-badge text-xs font-bold px-2 py-1 rounded-full">PREMIUM</span>
+                                <span class="ml-2">Unlock HD generations, priority processing, and more</span>
+                            </div>
+                            <button class="bg-indigo-600 px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+                                Upgrade Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Prompt Input -->
+                    <div class="relative">
+                        <textarea 
+                            id="promptInput"
+                            class="w-full bg-gray-800 rounded-xl p-6 pr-24 text-lg border-2 border-gray-700 focus:border-indigo-500 focus:ring-0 resize-none"
+                            rows="4"
+                            placeholder="Describe your vision in detail..."
+                        ></textarea>
+                        <div class="absolute right-4 bottom-4 flex gap-2">
+                            <button 
+                                id="generateBtn"
+                                class="bg-indigo-600 px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Controls -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Style Presets -->
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <label class="block text-sm font-medium mb-2">Style Preset</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button class="style-preset bg-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-600" data-model="stabilityai/stable-diffusion-xl-base-1.0">
+                                    Realistic
+                                </button>
+                                <button class="style-preset bg-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-600" data-model="lykon/dreamshaper-8">
+                                    Fantasy
+                                </button>
+                                <button class="style-preset bg-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-600" data-model="prompthero/openjourney">
+                                    Artistic
+                                </button>
+                                <button class="style-preset bg-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-600" data-model="Envvi/Inkpunk-Diffusion">
+                                    Cyberpunk
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quality Settings -->
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <label class="block text-sm font-medium mb-2">Quality Level</label>
+                            <input type="range" id="qualitySlider" min="1" max="100" value="50" 
+                                   class="quality-slider w-full bg-gray-700 rounded-lg h-2">
+                            <div class="text-xs text-gray-400 mt-1 flex justify-between">
+                                <span>Fast</span>
+                                <span>Balanced</span>
+                                <span>Quality</span>
+                            </div>
+                        </div>
+
+                        <!-- Output Settings -->
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <label class="block text-sm font-medium mb-2">Output Format</label>
+                            <div class="flex gap-2">
+                                <button class="format-btn bg-indigo-600 px-3 py-2 rounded text-sm" data-format="png">
+                                    PNG
+                                </button>
+                                <button class="format-btn bg-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-600" data-format="jpg">
+                                    JPG
+                                </button>
+                                <button class="format-btn bg-gray-700 px-3 py-2 rounded text-sm hover:bg-gray-600" data-format="webp">
+                                    WebP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Grid -->
+                    <div id="gallery" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                </div>
+            </section>
+
+            <!-- Premium Section -->
+            <section class="mt-20 border-t border-gray-800 pt-12">
+                <h2 class="text-3xl font-bold mb-8 text-center">Premium Features</h2>
+                <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <div class="bg-gray-800 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4">Starter</h3>
+                        <div class="text-4xl font-bold mb-4">$9<span class="text-lg text-gray-400">/mo</span></div>
+                        <ul class="space-y-3 text-gray-300">
+                            <li>✓ 500 Generations/Month</li>
+                            <li>✓ HD Resolution</li>
+                            <li>✓ 3 Style Presets</li>
+                        </ul>
+                    </div>
+                    <div class="gradient-border">
+                        <div class="bg-gray-900 p-6 rounded-xl">
+                            <h3 class="text-xl font-bold mb-4">Professional</h3>
+                            <div class="text-4xl font-bold mb-4">$29<span class="text-lg text-gray-400">/mo</span></div>
+                            <ul class="space-y-3 text-gray-300">
+                                <li>✓ Unlimited Generations</li>
+                                <li>✓ 4K Resolution</li>
+                                <li>✓ All Style Presets</li>
+                                <li>✓ Priority Support</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4">Enterprise</h3>
+                        <div class="text-4xl font-bold mb-4">Custom</div>
+                        <ul class="space-y-3 text-gray-300">
+                            <li>✓ Dedicated GPUs</li>
+                            <li>✓ API Access</li>
+                            <li>✓ Custom Models</li>
+                            <li>✓ 24/7 Support</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black/90 backdrop-blur-xl hidden items-center justify-center z-50">
+        <div class="text-center space-y-6 w-full max-w-lg">
+            <div class="text-3xl font-bold">Generating Your Artwork</div>
+            <div class="h-1 bg-gray-800 rounded-full overflow-hidden">
+                <div class="loading-bar h-full bg-indigo-600"></div>
+            </div>
+            <div class="text-gray-400 text-sm">Processing with Stable Diffusion XL 1.0</div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        const API_TOKEN = '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';
+        let currentConfig = {
+            model: 'stabilityai/stable-diffusion-xl-base-1.0',
+            quality: 50,
+            format: 'png'
+        };
+
+        // Initialize
+        AOS.init({ duration: 800 });
+        document.querySelectorAll('.style-preset')[0].classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+
+        // Event Listeners
+        document.querySelectorAll('.style-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.style-preset').forEach(b => b.classList.remove('bg-indigo-600', 'hover:bg-indigo-700'));
+                btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                currentConfig.model = btn.dataset.model;
+            });
+        });
+
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('bg-indigo-600', 'hover:bg-indigo-700'));
+                btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                currentConfig.format = btn.dataset.format;
+            });
+        });
+
+        document.getElementById('qualitySlider').addEventListener('input', (e) => {
+            currentConfig.quality = e.target.value;
+        });
+
+        document.getElementById('newProjectBtn').addEventListener('click', () => {
+            document.getElementById('promptInput').value = '';
+            document.getElementById('gallery').innerHTML = '';
+        });
+
+        // Generation Handler
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            const prompt = document.getElementById('promptInput').value.trim();
+            if (!prompt) return;
+
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingBar = document.querySelector('.loading-bar');
+            
+            try {
+                loadingOverlay.style.display = 'flex';
+                loadingBar.style.width = '0%';
+                setTimeout(() => loadingBar.style.width = '100%', 50);
+
+                const response = await fetch(
+                    `https://api-inference.huggingface.co/models/${currentConfig.model}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${API_TOKEN}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            inputs: prompt,
+                            parameters: {
+                                width: currentConfig.quality > 70 ? 1024 : 768,
+                                height: currentConfig.quality > 70 ? 1024 : 768,
+                                num_inference_steps: Math.floor(currentConfig.quality / 10) * 10 + 20
+                            }
+                        })
+                    }
+                );
+
+                if (!response.ok) throw new Error('Generation failed');
+                
+                const blob = await response.blob();
+                const imageUrl = URL.createObjectURL(blob);
+                
+                addToGallery(prompt, imageUrl);
+                saveToHistory(prompt, imageUrl);
+
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                loadingOverlay.style.display = 'none';
+                loadingBar.style.width = '0%';
+            }
+        });
+
+        function addToGallery(prompt, imageUrl) {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = `
+                <div class="result-card bg-gray-800 rounded-xl overflow-hidden relative group">
+                    <img src="${imageUrl}" class="w-full h-96 object-cover" alt="Generated image">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <p class="text-gray-300 text-sm truncate">"${prompt}"</p>
+                    </div>
+                    <div class="absolute top-4 right-4 flex gap-2">
+                        <button class="download-btn bg-gray-900/80 px-4 py-2 rounded-lg hover:bg-indigo-600"
+                                onclick="downloadImage('${imageUrl}')">
+                            Download
+                        </button>
+                    </div>
+                </div>
+            ` + gallery.innerHTML;
+        }
+
+        function downloadImage(url) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `artisanai-${Date.now()}.${currentConfig.format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // History Management
+        function saveToHistory(prompt, imageUrl) {
+            const history = JSON.parse(localStorage.getItem('aiHistory') || '[]');
+            history.unshift({
+                prompt,
+                imageUrl,
+                config: {...currentConfig},
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('aiHistory', JSON.stringify(history.slice(0, 50)));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('aiHistory') || '[]');
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-colors cursor-pointer"
+                     onclick="loadHistory('${item.timestamp}')">
+                    <div class="text-sm text-gray-300 truncate">${item.prompt}</div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        ${new Date(item.timestamp).toLocaleString()}
+                        <span class="ml-2 text-indigo-400">${item.config.model.split('/')[1]}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadHistory(timestamp) {
+            const history = JSON.parse(localStorage.getItem('aiHistory') || '[]');
+            const item = history.find(i => i.timestamp === timestamp);
+            if (item) {
+                document.getElementById('promptInput').value = item.prompt;
+                currentConfig = {...item.config};
+                updateUIWithConfig();
+                addToGallery(item.prompt, item.imageUrl);
+            }
+        }
+
+        function updateUIWithConfig() {
+            document.querySelectorAll('.style-preset').forEach(btn => {
+                if (btn.dataset.model === currentConfig.model) {
+                    btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                }
+            });
+
+            document.getElementById('qualitySlider').value = currentConfig.quality;
+            document.querySelectorAll('.format-btn').forEach(btn => {
+                if (btn.dataset.format === currentConfig.format) {
+                    btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                }
+            });
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('aiHistory');
+            renderHistory();
+        }
+
+        // Initial render
+        renderHistory();
+    </script>
+</body>
+</html>
